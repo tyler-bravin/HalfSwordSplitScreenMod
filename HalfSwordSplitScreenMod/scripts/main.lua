@@ -55,7 +55,7 @@ end
 
 local function CachePlayerControllers()
     PlayerControllerTable = {}
-    local AllPlayerControllers = FindAllOf("PlayerController") --or FindAllOf("Controller")
+    local AllPlayerControllers = FindAllOf("PlayerController") --better than FindAllOf("Controller")
     for Index, PlayerController in pairs(AllPlayerControllers) do
         if PlayerController:IsValid() and PlayerController.Player:IsValid() and not PlayerController:HasAnyInternalFlags(EInternalObjectFlags.PendingKill) then
             PlayerControllerTable[PlayerController.Player.ControllerId + 1] = PlayerController
@@ -74,9 +74,11 @@ local function CreatePlayer()
         NewController = GetGameplayStatics():CreatePlayer(PlayerControllerTable[1], #PlayerControllerTable, true)
         -- We need to insert this in the game thread or it will not be available outside of the callback
         if NewController:IsValid() then
+            -- Does not work anyway
+            -- NewController.SetSpawnLocation({X=1000, Y=1000, Z=100})
             table.insert(PlayerControllerTable, NewController)
             Logf("Player %s created.\n", #PlayerControllerTable)
-        else
+                    else
             Log("Player could not be created.\n")
         end
     end)
@@ -119,13 +121,26 @@ function TeleportPlayers()
     ExecuteInGameThread(function()
         PlayerPawn = PlayerControllerTable[1].Pawn
         PlayerPawnLocationVec = PlayerPawn.RootComponent:K2_GetComponentLocation()
+        Logf("Player 1 at {X=%.3f, Y=%.3f, Z=%.3f}\n", PlayerPawnLocationVec.X, PlayerPawnLocationVec.Y, PlayerPawnLocationVec.Z)
+        PlayerPawnLocationVec.X = PlayerPawnLocationVec.X + 100.0
+        PlayerPawnLocationVec.Y = PlayerPawnLocationVec.Y + 100.0
+        PlayerPawnLocationVec.Z = PlayerPawnLocationVec.Z + 0.0
         PlayerPawnLocationRot = PlayerPawn.RootComponent:K2_GetComponentRotation()
         local HitResult = {}
+        local res
         for i, EachPlayerController in ipairs(PlayerControllerTable) do
             if i > 1 and EachPlayerController.Pawn:IsValid() then
-                EachPlayerController.Pawn:K2_SetActorLocationAndRotation(PlayerPawnLocationVec, PlayerPawnLocationRot,
+                Logf("Teleporting to {X=%.3f, Y=%.3f, Z=%.3f}\n", PlayerPawnLocationVec.X, PlayerPawnLocationVec.Y, PlayerPawnLocationVec.Z)
+--                EachPlayerController.Pawn:SetActorEnableCollision(false)
+                res = EachPlayerController.Pawn:K2_SetActorLocationAndRotation(PlayerPawnLocationVec, PlayerPawnLocationRot,
                     false, HitResult, false)
+--                res = EachPlayerController.Pawn:K2_SetActorLocation(PlayerPawnLocationVec, --PlayerPawnLocationRot,
+--                    false, HitResult, true)
+--                    res = EachPlayerController.Pawn:TeleportTo(PlayerPawnLocationVec, PlayerPawnLocationRot,
+--                    false, true)
+--                EachPlayerController.Pawn:SetActorEnableCollision(true)
                 DidTeleport = true
+                Logf("Teleport Player #%d result: %s\n", i, tostring(res))
             end
         end
 
