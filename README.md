@@ -16,6 +16,7 @@ It is based on UE4SS default `SplitScreenMod` with Half Sword specific changes.
 Distributed under the MIT License. See `LICENSE` file for more information.
 
 ## Showcase
+[![YouTube video of Half Sword Split Screen Mod](https://img.youtube.com/vi/E2FQuDH_NJ4/hqdefault.jpg)](https://www.youtube.com/watch?v=E2FQuDH_NJ4)
 
 ## Installation
 
