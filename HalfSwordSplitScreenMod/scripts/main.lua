@@ -41,6 +41,80 @@ function string:ends_with(ending)
 end
 
 ------------------------------------------------------------------------------
+function RemapAllIKDBs()
+    local IKDBInstances = FindAllOf("InputKeyDelegateBinding")
+    if not IKDBInstances then
+        print("No instances of 'InputKeyDelegateBinding' were found\n")
+    else
+        for Index, IKDBInstance in pairs(IKDBInstances) do
+            Logf("[%d] %s\n", Index, IKDBInstance:GetFullName())
+            RemapIKDBForGamepad(IKDBInstance)
+        end
+    end
+end
+------------------------------------------------------------------------------
+function RemapIKDBForGamepad(InputKeyDelegateBindingInstance)
+    Logf("bindings object [%s]\n", tostring(InputKeyDelegateBindingInstance))
+    if InputKeyDelegateBindingInstance == nil or not InputKeyDelegateBindingInstance:IsValid() then
+        ErrLogf("Could not find InputKeyDelegateBinding\n")
+    else
+        ---@class TArray
+        local bindingArray = InputKeyDelegateBindingInstance['InputKeyDelegateBindings']
+        bindingArray:ForEach(function(Index, Element)
+            local this_binding = Element:get()
+            Logf("Binding [%s] %s\n", Index, this_binding)
+            local FunctionNameToBind = this_binding['FunctionNameToBind']
+            Logf("FunctionNameToBind: [%s]\n", FunctionNameToBind:ToString())
+            local InputKeyEvent = this_binding['InputKeyEvent']
+            Logf("InputKeyEvent: [%s]\n", tostring(InputKeyEvent))
+            local InputChord = this_binding['InputChord']
+            Logf("InputChord: [%s]\n", tostring(InputChord))
+            Logf("InputChord.Key.Name: [%s]\n", InputChord["Key"]["KeyName"]:ToString())
+            if FunctionNameToBind:ToString() == "InpActEvt_Q_K2Node_InputKeyEvent_4" then
+                this_binding["InputChord"]["Key"]["KeyName"] = FName("Gamepad_LeftShoulder")
+                local luatable_binding = {
+                    FunctionNameToBind = this_binding['FunctionNameToBind'],
+                    InputKeyEvent = this_binding['InputKeyEvent'],
+                    InputChord = this_binding['InputChord']
+                }
+                Element:set(luatable_binding)
+            end
+            if FunctionNameToBind:ToString() == "InpActEvt_Q_K2Node_InputKeyEvent_5" then
+                this_binding["InputChord"]["Key"]["KeyName"] = FName("Gamepad_LeftShoulder")
+                local luatable_binding = {
+                    FunctionNameToBind = this_binding['FunctionNameToBind'],
+                    InputKeyEvent = this_binding['InputKeyEvent'],
+                    InputChord = this_binding['InputChord']
+                }
+                Element:set(luatable_binding)
+            end
+            if FunctionNameToBind:ToString() == "InpActEvt_E_K2Node_InputKeyEvent_2" then
+                this_binding["InputChord"]["Key"]["KeyName"] = FName("Gamepad_RightShoulder")
+                local luatable_binding = {
+                    FunctionNameToBind = this_binding['FunctionNameToBind'],
+                    InputKeyEvent = this_binding['InputKeyEvent'],
+                    InputChord = this_binding['InputChord']
+                }
+                Element:set(luatable_binding)
+            end
+            if FunctionNameToBind:ToString() == "InpActEvt_E_K2Node_InputKeyEvent_3" then
+                this_binding["InputChord"]["Key"]["KeyName"] = FName("Gamepad_RightShoulder")
+                local luatable_binding = {
+                    FunctionNameToBind = this_binding['FunctionNameToBind'],
+                    InputKeyEvent = this_binding['InputKeyEvent'],
+                    InputChord = this_binding['InputChord']
+                }
+                Element:set(luatable_binding)
+            end
+        end)
+    end
+end
+
+-- Dirty hack
+NotifyOnNewObject("/Script/Engine.Character", function(ConstructedObject)
+    Logf("HOOK Willie_BP Constructed: %s\n", ConstructedObject:GetFullName())
+    RemapAllIKDBs()
+end)
 
 local function Init()
     GetGameMapsSettings().bUseSplitscreen = true
@@ -50,6 +124,8 @@ local function Init()
     Logf("OffsetPlayerGamepadIds: %s\n", GetGameMapsSettings().bOffsetPlayerGamepadIds)
     Logf("TwoPlayerSplitscreenLayout: %d\n", GetGameMapsSettings().TwoPlayerSplitscreenLayout)
 
+--    RemapAllIKDBs()
+
     IsInitialized = true
 end
 
@@ -57,6 +133,7 @@ local function CachePlayerControllers()
     PlayerControllerTable = {}
     local AllPlayerControllers = FindAllOf("PlayerController") --better than FindAllOf("Controller")
     for Index, PlayerController in pairs(AllPlayerControllers) do
+--        RemapAllIKDBs()
         if PlayerController:IsValid() and PlayerController.Player:IsValid() and not PlayerController:HasAnyInternalFlags(EInternalObjectFlags.PendingKill) then
             PlayerControllerTable[PlayerController.Player.ControllerId + 1] = PlayerController
         end
@@ -69,6 +146,9 @@ local function CreatePlayer()
     Log("Creating player..\n")
     CachePlayerControllers()
 
+    --local map = FindFirstOf("Abyss_Map_Open_C")
+    --local player = map['Player Willie']
+
     Logf("GameplayStatics: %s\n", GetGameplayStatics():GetFullName())
     ExecuteInGameThread(function()
         NewController = GetGameplayStatics():CreatePlayer(PlayerControllerTable[1], #PlayerControllerTable, true)
@@ -78,7 +158,7 @@ local function CreatePlayer()
             -- NewController.SetSpawnLocation({X=1000, Y=1000, Z=100})
             table.insert(PlayerControllerTable, NewController)
             Logf("Player %s created.\n", #PlayerControllerTable)
-                    else
+        else
             Log("Player could not be created.\n")
         end
     end)
@@ -121,7 +201,8 @@ function TeleportPlayers()
     ExecuteInGameThread(function()
         PlayerPawn = PlayerControllerTable[1].Pawn
         PlayerPawnLocationVec = PlayerPawn.RootComponent:K2_GetComponentLocation()
-        Logf("Player 1 at {X=%.3f, Y=%.3f, Z=%.3f}\n", PlayerPawnLocationVec.X, PlayerPawnLocationVec.Y, PlayerPawnLocationVec.Z)
+        Logf("Player 1 at {X=%.3f, Y=%.3f, Z=%.3f}\n", PlayerPawnLocationVec.X, PlayerPawnLocationVec.Y,
+            PlayerPawnLocationVec.Z)
         PlayerPawnLocationVec.X = PlayerPawnLocationVec.X + 100.0
         PlayerPawnLocationVec.Y = PlayerPawnLocationVec.Y + 100.0
         PlayerPawnLocationVec.Z = PlayerPawnLocationVec.Z + 0.0
@@ -130,15 +211,17 @@ function TeleportPlayers()
         local res
         for i, EachPlayerController in ipairs(PlayerControllerTable) do
             if i > 1 and EachPlayerController.Pawn:IsValid() then
-                Logf("Teleporting to {X=%.3f, Y=%.3f, Z=%.3f}\n", PlayerPawnLocationVec.X, PlayerPawnLocationVec.Y, PlayerPawnLocationVec.Z)
---                EachPlayerController.Pawn:SetActorEnableCollision(false)
-                res = EachPlayerController.Pawn:K2_SetActorLocationAndRotation(PlayerPawnLocationVec, PlayerPawnLocationRot,
+                Logf("Teleporting to {X=%.3f, Y=%.3f, Z=%.3f}\n", PlayerPawnLocationVec.X, PlayerPawnLocationVec.Y,
+                    PlayerPawnLocationVec.Z)
+                --                EachPlayerController.Pawn:SetActorEnableCollision(false)
+                res = EachPlayerController.Pawn:K2_SetActorLocationAndRotation(PlayerPawnLocationVec,
+                    PlayerPawnLocationRot,
                     false, HitResult, false)
---                res = EachPlayerController.Pawn:K2_SetActorLocation(PlayerPawnLocationVec, --PlayerPawnLocationRot,
---                    false, HitResult, true)
---                    res = EachPlayerController.Pawn:TeleportTo(PlayerPawnLocationVec, PlayerPawnLocationRot,
---                    false, true)
---                EachPlayerController.Pawn:SetActorEnableCollision(true)
+                --                res = EachPlayerController.Pawn:K2_SetActorLocation(PlayerPawnLocationVec, --PlayerPawnLocationRot,
+                --                    false, HitResult, true)
+                --                    res = EachPlayerController.Pawn:TeleportTo(PlayerPawnLocationVec, PlayerPawnLocationRot,
+                --                    false, true)
+                --                EachPlayerController.Pawn:SetActorEnableCollision(true)
                 DidTeleport = true
                 Logf("Teleport Player #%d result: %s\n", i, tostring(res))
             end
