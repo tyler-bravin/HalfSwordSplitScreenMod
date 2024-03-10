@@ -1,4 +1,4 @@
--- Half Sword Split Screen Mod v0.1 by massclown
+-- Half Sword Split Screen Mod v0.2 by massclown
 -- This is heavily based on UE4SS SplitScreenMod
 -- https://github.com/massclown/HalfSwordSplitScreenMod
 -- Requirements: UE4SS 2.5.2 (or newer)
@@ -7,7 +7,7 @@ local UEHelpers = require("UEHelpers")
 -- Importing functions to the global namespace of this mod just so that we don't have to retype 'UEHelpers.' over and over again.
 local GetGameplayStatics = UEHelpers.GetGameplayStatics
 local GetGameMapsSettings = UEHelpers.GetGameMapsSettings
-
+local GetWorldContextObject = UEHelpers.GetWorldContextObject
 -- Set this value to true if you wish for the first controller to control player 1, or false if you want the first controller to control player 2
 local bOffsetGamepad = true
 -- 0 is default horizontal (top and bottom), 1 is vertical (left and right)
@@ -95,13 +95,48 @@ function RemapIKDBForGamepad(InputKeyDelegateBindingInstance)
     end
 end
 
--- Dirty hack
-NotifyOnNewObject("/Script/Engine.Character", function(ConstructedObject)
-    Logf("HOOK Willie_BP Constructed: %s\n", ConstructedObject:GetFullName())
-    RemapAllIKDBs()
-end)
+------------------------------------------------------------------------------
+-- HUD is present when game starts, we can remove it already
+function RemovePlayerOneHUD()
+    -- UI_HUD_C
+    local HUD = FindFirstOf("UI_HUD_C")
+    if HUD and HUD:IsValid() then
+        HUD:RemoveFromViewport()
+        Logf("Removing HUD\n")
+    end
+end
 
-local function Init()
+------------------------------------------------------------------------------
+-- This has to be called when the DED screen is triggered, not before
+function RemovePlayerOneDeathScreen()
+    -- UI_DED_C
+    local DED = FindFirstOf("UI_DED_C")
+    if DED and DED:IsValid() then
+        DED:RemoveFromViewport()
+        Logf("Removing Death screen\n")
+        if GetGameplayStatics():IsGamePaused(GetWorldContextObject()) then
+            GetGameplayStatics():SetGamePaused(GetWorldContextObject(), false)
+            Logf("Unpausing game after death screen\n")
+        end
+    end
+end
+
+------------------------------------------------------------------------------
+function HookPlayerOneDead()
+    Logf("Player dead hook called\n")
+    RemovePlayerOneDeathScreen()
+end
+
+------------------------------------------------------------------------------
+function InitEveryGame()
+    Logf("ClientRestart hook\n")
+    ExecuteWithDelay(1000, function()
+        RemovePlayerOneHUD()
+    end)
+end
+
+------------------------------------------------------------------------------
+local function InitMod()
     GetGameMapsSettings().bUseSplitscreen = true
     GetGameMapsSettings().bOffsetPlayerGamepadIds = bOffsetGamepad
     GetGameMapsSettings().TwoPlayerSplitscreenLayout = TwoPlayerSplitscreenLayout
@@ -113,7 +148,7 @@ local function Init()
 
     IsInitialized = true
 end
-
+------------------------------------------------------------------------------
 local function CachePlayerControllers()
     PlayerControllerTable = {}
     local AllPlayerControllers = FindAllOf("PlayerController") --better than FindAllOf("Controller")
@@ -124,9 +159,7 @@ local function CachePlayerControllers()
         end
     end
 end
-
-Init()
-
+------------------------------------------------------------------------------
 local function CreatePlayer()
     Log("Creating player..\n")
     CachePlayerControllers()
@@ -148,7 +181,7 @@ local function CreatePlayer()
         end
     end)
 end
-
+------------------------------------------------------------------------------
 function DestroyPlayer()
     -- The caller is caching the player controllers so that it can output that the correct player is being destroyed.
     CachePlayerControllers()
@@ -171,6 +204,7 @@ function DestroyPlayer()
     end)
 end
 
+------------------------------------------------------------------------------
 -- -- Teleporting does not work at all yet
 -- function TeleportPlayers()
 --     CachePlayerControllers()
@@ -220,9 +254,24 @@ end
 --         end
 --     end)
 -- end
-
+------------------------------------------------------------------------------
+InitMod()
+------------------------------------------------------------------------------
+-- Dirty hack
+NotifyOnNewObject("/Script/Engine.Character", function(ConstructedObject)
+    Logf("HOOK Willie_BP Constructed: %s\n", ConstructedObject:GetFullName())
+    RemapAllIKDBs()
+end)
+------------------------------------------------------------------------------
+RegisterHook("/Script/Engine.PlayerController:ClientRestart", InitEveryGame)
+--RegisterHook("/Game/Character/Blueprints/Willie_BP.Willie_BP_C:Dead", HookPlayerOneDead)
+------------------------------------------------------------------------------
 RegisterKeyBind(Key.N, { ModifierKey.CONTROL }, CreatePlayer)
 
 RegisterKeyBind(Key.U, { ModifierKey.CONTROL }, DestroyPlayer)
 
+RegisterKeyBind(Key.D, { ModifierKey.CONTROL }, RemovePlayerOneDeathScreen)
+
 --RegisterKeyBind(Key.I, { ModifierKey.CONTROL }, TeleportPlayers)
+------------------------------------------------------------------------------
+-- EOF
