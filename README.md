@@ -1,6 +1,6 @@
 # Half Sword Split Screen Mod
 A split screen mod for Half Sword demo v0.3 ([Steam release](https://store.steampowered.com/app/2397300/Half_Sword/)). 
-The mod allows you to play Half Sword with two people on two controllers locally (or over Steam Remote Play).
+The mod allows you to play Half Sword with two people on two controllers locally (or over Steam Remote Play Together).
 The split screen is vertical (left half and right half). 
 You still need a keyboard/mouse to restart the game.
 
@@ -79,7 +79,7 @@ We need HalfSwordSplitScreenMod to be enabled.
 Delete the files that you copied as described above, or just reinstall the entire Half Sword game entirely (it will wipe all the folders where the installed mod is located)
 
 ## How to use the mod
-You need two controllers to play it. Keyboard + one controller will not work, only two controllers!
+You need **two controllers** to play it locally. `Ctrl + N` adds a new player. One keyboard + one controller will not work, only **two controllers**!
 
 Control the movement of the player with left stick, aiming and swinging with the right stick.
 
@@ -87,11 +87,14 @@ Triggers activate the corresponding arms, bumpers/shoulders pickup or drop weapo
 
 The left-most button of the 4-button group ('X' on Xbox controller, '□' on PS controller) switches hands.
 
+The mod hides the default damage HUD and allows you to skip the death screen of the first player when the first player dies (`Ctrl + D`).
+
 ### Keyboard shortcuts of this mod
 | Shortcut    | Description |
 | ----------- | ----------- |
 | `Ctrl + N`  | Add a new player |
-| `Ctrl + U`  | Delete a player |
+| `Ctrl + U`  | Delete last added player |
+| `Ctrl + D`  | Hide the first player death screen (only when he is dead) |
 
 ### Other good things
 * UE4SS also enables the Unreal Engine console, which can be shown by pressing `F10` or `@`. It is useful to change video settings that are not exposed in Half Sword original UI. 
@@ -107,14 +110,15 @@ The left-most button of the 4-button group ('X' on Xbox controller, '□' on PS 
 
 
 ## Know issues and TODOs
-* The mod is not really compatible with Half Sword Trainer Mod. Expect even more crashes if you use both!
+* When the mod is enabled, standard keyboard keybinds are unusable. Disable the mod if you want single player mode back.
+* The mod is not really compatible with Half Sword Trainer Mod. They will work, but expect even more crashes if you use both! 
 * NPCs will keep auto-spawning.
-* Player 2 has no HUD, and HUD of Player 1 fills the entire screen when Player 1 is damaged.
-* Death of Player 2 allows Player 1 to keep playing, but not vice versa.
 * Only some of the keybindings are available (no crouch, no target lock-on, etc.)
 * Inventory is bugged and cannot be shown.
 * The second player gets launched in the air on start. Simply restart to fix that.
-* You need a keyboard to restart or change settings.
+* You still need a keyboard to restart or change settings.
+* If you have issues with PS controllers, use DS4 (https://github.com/Ryochan7/DS4Windows) or similar software to emulate Xbox controllers.
+* If Steam Remote Play Together does not work for you, use https://github.com/m4dEngi/RemotePlayWhatever.
 * There will be crashes. You have been warned.
 
 ## FAQ
