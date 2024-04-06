@@ -17,7 +17,7 @@ It is based on UE4SS default `SplitScreenMod` with Half Sword specific changes.
 
 # Installation (easy mode)
 
-# One-click automatic installer at https://github.com/massclown/HalfSwordModInstaller/releases/latest/download
+# One-click automatic installer at https://github.com/massclown/HalfSwordModInstaller/releases/latest/download/HalfSwordModInstaller.exe
 
 # Automatic installer documentation at https://github.com/massclown/HalfSwordModInstaller
 
