@@ -12,13 +12,20 @@ The mod requires [UE4SS](https://github.com/UE4SS-RE/RE-UE4SS) (version 2.5.2 as
 The mod is written in Lua, so you can understand and modify its functionality.
 It is based on UE4SS default `SplitScreenMod` with Half Sword specific changes.
 
-## License
-Distributed under the MIT License. See `LICENSE` file for more information.
-
 ## Showcase
 [![YouTube video of Half Sword Split Screen Mod](https://img.youtube.com/vi/E2FQuDH_NJ4/hqdefault.jpg)](https://www.youtube.com/watch?v=E2FQuDH_NJ4)
 
-## Installation
+# Installation (easy mode)
+
+# One-click automatic installer at https://github.com/massclown/HalfSwordModInstaller/releases/latest/download
+
+# Automatic installer documentation at https://github.com/massclown/HalfSwordModInstaller
+
+
+# Installation (hard mode)
+
+<details>
+  <summary>Click to see the full installation instructions (hard mode)</summary>
 
 The installation process is very similar to installing [Half Sword Trainer Mod](https://github.com/massclown/HalfSwordTrainerMod) or any other mod on top of UE4SS.
 
@@ -63,7 +70,13 @@ The new lines in the middle of the file should look like this:
 HalfSwordSplitScreenMod : 1
 ...
 ```
-We need HalfSwordSplitScreenMod to be enabled.
+We need `HalfSwordSplitScreenMod` to be enabled (not `SplitScreenMod`!).
+
+> **WARNING!** `HalfSwordSplitScreenMod` is not the same as `SplitScreenMod`!
+>
+> * `SplitScreenMod` is the original UE4SS built-in mod and it is not what you want, as it is not playable with Half Sword. 
+> * `HalfSwordSplitScreenMod` fixes the controllers, HUD and screen layout, etc.
+
 
 5) Enjoy the game and support the developers.
 
@@ -77,6 +90,8 @@ We need HalfSwordSplitScreenMod to be enabled.
 
 ## Uninstalling
 Delete the files that you copied as described above, or just reinstall the entire Half Sword game entirely (it will wipe all the folders where the installed mod is located)
+
+</details>
 
 ## How to use the mod
 You need **two controllers** to play it locally. `Ctrl + N` adds a new player. One keyboard + one controller will not work, only **two controllers**!
@@ -162,6 +177,9 @@ File an issue here, at https://github.com/massclown/HalfSwordSplitScreenMod/issu
 
 ### Any other problem with this mod, or a feature request?
 File an issue here, at https://github.com/massclown/HalfSwordSplitScreenMod/issues
+
+## License
+Distributed under the MIT License. See `LICENSE` file for more information.
 
 ## Acknowledgements
 * Half Sword developers, https://halfswordgames.com/
