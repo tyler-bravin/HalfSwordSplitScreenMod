@@ -2,5 +2,6 @@
     "search.useIgnoreFiles": false,
     "Lua.workspace.useGitIgnore": false,
     "cSpell.useGitignore": false,
-    "Lua.workspace.preloadFileSize": 2000
+    "Lua.workspace.preloadFileSize": 2000,
+    "editor.dropIntoEditor.preferences": []
 }
